@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Quickshell Rise — one-command installer
 # Usage:
-#   bash <(curl -fsSL https://raw.githubusercontent.com/HANCORE-linux/quickshell-dots/main/install.sh)
+#   bash <(curl -fsSL https://raw.githubusercontent.com/lemun/quickshell-dots/main/install.sh)
 #   bash <(curl -fsSL .../install.sh) V1          # select the initial UI variant non-interactively
 #   bash <(curl -fsSL .../install.sh) V1 --autostart
 # Autostart via Omarchy post-boot hook (opt-in).
@@ -28,6 +28,11 @@ for a in "$@"; do
     *) WANT_VERSION="$a" ;;
   esac
 done
+
+if [[ -n "$WANT_PROFILE" && "$WANT_PROFILE" != "shai" ]]; then
+  printf "Unknown profile: %s\n" "$WANT_PROFILE" >&2
+  exit 1
+fi
 
 c_b=$'\e[1m'; c_g=$'\e[32m'; c_y=$'\e[33m'; c_r=$'\e[31m'; c_0=$'\e[0m'
 info() { printf "%s==>%s %s\n" "$c_g" "$c_0" "$*"; }
@@ -378,6 +383,13 @@ verify_selected_variant() {
 
 # ── 3. choose initial UI variant ────────────────────────────────
 choice="$WANT_VERSION"
+if [[ -z "$choice" && -n "$WANT_PROFILE" ]]; then
+  profile_variant="$(tr -d '[:space:]' < "$tmp/repo/profiles/$WANT_PROFILE/active-variant")"
+  case "$profile_variant" in
+    v1|v2) choice="${profile_variant^^}" ;;
+    *) err "Invalid variant in profile: $WANT_PROFILE"; exit 1 ;;
+  esac
+fi
 if [[ -z "$choice" ]]; then
   if choice="$(read_saved_variant)"; then
     info "Keeping previously active UI variant '${c_b}$choice${c_0}'"

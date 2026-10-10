@@ -1228,6 +1228,7 @@ PanelWindow {
     Component {
         id: compBluetooth
         BluetoothWidget {
+            screen: barSlot.screen
             root: barSlot.root
             readonly property real barContentLeftInset: 9
             readonly property real barContentRightInset: 9
@@ -2064,6 +2065,7 @@ PanelWindow {
                 arch:         island.groupX("G3",  0.5),
                 archCaret:    island.groupContentX("G3", "archCaretX", 0.5),
                 bluetooth:    island.groupX("G15", 0.5),
+                airpods:      island.groupContentX("G15", "airpodsCaretX", 0.5),
                 brightness:   island.groupX("G13", 0.5),
                 power:        island.groupX("G14", 0.5),
                 mpris:        island.groupX("G9",  0.5),

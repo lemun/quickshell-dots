@@ -14,7 +14,9 @@ bash install.sh V2 --autostart --no-ai-backend --profile=shai
 ```
 
 `--profile=shai` restores the saved widget selection, layout, and appearance.
-It backs up previous preferences. Omit it to keep that machine's preferences.
+It backs up previous preferences. With no explicit V1/V2 argument, the installer
+uses the profile's saved V2 variant; an explicit argument takes precedence.
+Omit the profile option to keep that machine's preferences.
 The bar follows the machine's current Omarchy theme. Monitor configuration,
 wallpapers, credentials, Bluetooth pairing keys, and other desktop settings
 are not part of this bar profile. Pair your AirPods independently on each box.
@@ -30,7 +32,7 @@ The icon stays visible and displays a service/disconnected message until the
 daemon and paired AirPods are available. Building the daemon may request package
 installation privileges. These commands run the upstream plugin's setup.
 
-To reapply only the personal preferences from this checkout:
+To reapply only the personal preferences (without switching variants) from this checkout:
 
 ```bash
 python3 scripts/qs-apply-profile.py shai

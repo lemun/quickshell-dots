@@ -28,11 +28,12 @@ Use the same literal configuration path for startup, logs, IPC, and process sele
 
 ## Run the regression suites
 
-The six shell suites use isolated fixtures for lifecycle, installer, updater, theme, package, and AI usage behavior.
+The six upstream shell suites use isolated fixtures for lifecycle, installer, updater, theme, package, and AI usage behavior.
 
 Run them from the repository root:
 
 ```bash
+./tests/qs-airpods-regression.sh
 ./tests/qs-arch-update-regression.sh
 ./tests/qs-barctl-regression.sh
 ./tests/qs-codex-usage-regression.sh

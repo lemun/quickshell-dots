@@ -481,7 +481,7 @@ PanelWindow {
     Component { id: compPower;      PowerProfileWidget { root: barSlot.root } }
     Component { id: compBattery;    BatteryWidget      { root: barSlot.root } }
     Component { id: compBrightness; BrightnessWidget   { root: barSlot.root } }
-    Component { id: compBluetooth;  BluetoothWidget    { root: barSlot.root } }
+    Component { id: compBluetooth;  BluetoothWidget    { root: barSlot.root; screen: barSlot.screen } }
 
     readonly property var registry: ({
         "G1": compLauncher, "G2": compWorkspace, "G3": compStatus,
@@ -520,6 +520,7 @@ PanelWindow {
                 required property int index
                 // workspace draws a pill 4px wider than its implicitWidth on each
                 // side; pad its slot symmetrically so inter-group gaps stay uniform.
+                readonly property var contentItem: ldr.item
                 readonly property int pad: slot.gid === "G2" ? barSlot.root.wsPillPad : 0
                 readonly property bool hasContent: Math.round(ldr.implicitWidth) > 0.5
                 readonly property bool hasGapAfter: splitsArr ? (index < splitsArr.length) : false
@@ -924,6 +925,24 @@ PanelWindow {
             return 0
         }
 
+        function groupContentX(gid, propertyName, fallbackFrac) {
+            var rows = [leftRowItem, centerRowItem, rightRowItem]
+            for (var r = 0; r < rows.length; r++) {
+                var row = rows[r]
+                var rep = row.rep
+                if (!rep) continue
+                for (var k = 0; k < rep.count; k++) {
+                    var it = rep.itemAt(k)
+                    if (it && it.gid === gid && it.contentItem
+                            && it.contentItem[propertyName] !== undefined) {
+                        return island.x + row.x + it.x + it.pad
+                            + Number(it.contentItem[propertyName])
+                    }
+                }
+            }
+            return groupX(gid, fallbackFrac)
+        }
+
         readonly property string panelScreenName: barSlot.screen ? barSlot.screen.name : ""
         readonly property var panelAnchors: {
             void(island.width)
@@ -943,6 +962,7 @@ PanelWindow {
                 workspace:    island.groupX("G2",  0.5),
                 arch:         island.groupX("G3",  0.5),
                 bluetooth:    island.groupX("G15", 0.5),
+                airpods:      island.groupContentX("G15", "airpodsCaretX", 0.5),
                 brightness:   island.groupX("G13", 0.5),
                 power:        island.groupX("G14", 0.5),
                 mpris:        island.groupX("G9",  0.5),

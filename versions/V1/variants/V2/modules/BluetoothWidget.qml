@@ -7,7 +7,10 @@ import "../IconMap.js" as IconMap
 Item {
     id: rootMod
     required property var root
+    required property var screen
     readonly property color contentColor: root.widgetContentColor("G15", root.ink)
+
+    readonly property real airpodsCaretX: row.x + airpodsBadge.x + airpodsBadge.width / 2
 
     property bool btOn:       false
     property bool connected:  false
@@ -54,9 +57,12 @@ Item {
             font.pixelSize: 12
         }
         AirPods.AirPodsBadge {
+            id: airpodsBadge
+            screen: rootMod.screen
             anchors.verticalCenter: parent.verticalCenter
             theme: rootMod.root
-            foreground: rootMod.root.ink
+            foreground: rootMod.contentColor
+            activeForeground: root.widgetHasFill("G15") ? rootMod.contentColor : root.seal
         }
     }
 
@@ -105,7 +111,10 @@ Item {
         onClicked: (e) => {
             tip.hide()
             if (e.button === Qt.RightButton) { clickRunner.running = false; clickRunner.running = true }
-            else root.bluetoothVisible = !root.bluetoothVisible
+            else {
+                root.activatePopupScreen(rootMod.screen)
+                root.bluetoothVisible = !root.bluetoothVisible
+            }
         }
     }
 }

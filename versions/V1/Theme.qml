@@ -373,6 +373,7 @@ Item {
         else if (name === "workspace") workspaceBarX = x
         else if (name === "arch") archBarX = x
         else if (name === "bluetooth") bluetoothBarX = x
+        else if (name === "airpods") airpodsBarX = x
         else if (name === "brightness") brightnessBarX = x
         else if (name === "power") powerBarX = x
         else if (name === "mpris") mprisBarX = x

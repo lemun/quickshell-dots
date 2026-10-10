@@ -90,6 +90,8 @@ PanelWindow {
             border.width: panel.isV2 ? 0 : root.pillBorderW
             Column {
                 id: contents
+                // The loaded V2 surface is reparented after this column.
+                z: 1
                 x: 12; y: 12
                 width: parent.width - 24
                 spacing: 8
@@ -141,14 +143,22 @@ PanelWindow {
                 MenuText {
                     width: parent.width
                     wrapMode: Text.WordWrap
-                    text: !pods.daemonReachable ? "AirPods service unavailable"
+                    text: pods.lastError ? pods.lastError
+                        : !pods.daemonReachable ? "AirPods service unavailable"
                         : !pods.hasAirPods && !pods.hasBattery ? "AirPods disconnected"
-                        : pods.isHeadset ? "Battery: " + Model.levelText(pods.headsetBattery.level)
-                        : "Left: " + Model.levelText(pods.leftPod.level)
-                            + "   Right: " + Model.levelText(pods.rightPod.level)
-                            + "\nCase: " + Model.levelText(pods.caseBattery.level)
+                        : pods.isHeadset ? "Battery: " + Model.levelText(pods.headsetBattery.level) + (pods.headsetBattery.charging ? " · Charging" : "")
+                        : "Left: " + Model.levelText(pods.leftPod.level) + (pods.leftPod.charging ? " ⚡" : "")
+                            + "   Right: " + Model.levelText(pods.rightPod.level) + (pods.rightPod.charging ? " ⚡" : "")
+                            + "\nCase: " + Model.levelText(pods.caseBattery.level) + (pods.caseBattery.charging ? " ⚡" : "")
                     color: pods.hasBattery ? root.ink : root.sumi
                     topPadding: 4; bottomPadding: 4
+                }
+                MenuText {
+                    width: parent.width
+                    visible: pods.actionStatus !== ""
+                    text: pods.actionStatus
+                    wrapMode: Text.WordWrap
+                    color: root.seal
                 }
                 Repeater {
                     model: pods.hasAirPods ? pods.availableModes() : []

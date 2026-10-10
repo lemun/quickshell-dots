@@ -337,6 +337,7 @@ Item {
         else if (name === "arch") archBarX = x
         else if (name === "archCaret") archCaretBarX = x
         else if (name === "bluetooth") bluetoothBarX = x
+        else if (name === "airpods") airpodsBarX = x
         else if (name === "brightness") brightnessBarX = x
         else if (name === "power") powerBarX = x
         else if (name === "mpris") mprisBarX = x

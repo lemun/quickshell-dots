@@ -73,6 +73,9 @@ Item {
     var status = Model.parseStatus(raw)
     if (!status.ok) {
       // A line we cannot read still proves the daemon is running and writing.
+      _clearPending()
+      _queued = null
+      applyStatus(Model.defaultStatus())
       daemonReachable = true
       connected = false
       schemaUnsupported = status.schemaTooNew
@@ -87,6 +90,9 @@ Item {
 
   // The daemon removes the file when it stops, so an absent file is a stopped daemon.
   function stateGone() {
+    _clearPending()
+    applyStatus(Model.defaultStatus())
+    _queued = null
     daemonReachable = false
     connected = false
     schemaUnsupported = false
@@ -133,7 +139,7 @@ Item {
   }
 
   function _send(verb, field, optimistic) {
-    if (verb === "") return
+    if (verb === "" || !hasAirPods) return
     if (commandProcess.running) {
       _queued = { verb: verb, field: field, optimistic: optimistic }
       _pendingField = field
@@ -152,7 +158,7 @@ Item {
 
   // Guards the keyboard and the bar's right click too, not just the panel rows.
   function setNoiseMode(mode) {
-    if (availableModes().indexOf(mode) < 0) return
+    if (!hasAirPods || availableModes().indexOf(mode) < 0) return
     _send(Model.noiseModeVerb(mode), "noiseMode", mode)
   }
 
@@ -170,15 +176,18 @@ Item {
   }
 
   function setAdaptiveNoiseLevel(level) {
+    if (!supportsAdaptive) return
     var clamped = Math.max(0, Math.min(100, Math.round(level)))
     _send("adaptive:" + clamped, "adaptiveNoiseLevel", clamped)
   }
 
   function setConversationalAwareness(enabled) {
+    if (!supportsConversationalAwareness) return
     _send(enabled ? "ca:on" : "ca:off", "conversationalAwareness", enabled)
   }
 
   function setOneBudANC(enabled) {
+    if (!supportsOneBudANC) return
     _send(enabled ? "onebud:on" : "onebud:off", "oneBudANC", enabled)
   }
 
