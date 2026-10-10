@@ -1,3 +1,6 @@
+> Personal fork: AirPods integration and Shai's saved V2 layout.
+> See [setup and upstream updates](docs/airpods.md).
+
 <h1 align="center"> Quickshell Rise </h1>
 
 <h4 align="center"> My Quickshell bar for Omarchy — my new Rise journey into Quickshell starts here. Enjoy! </h4>
@@ -28,7 +31,7 @@
 Install and start the bar for the current session with V1 initially active:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/HANCORE-linux/quickshell-dots/main/install.sh | bash -s V1
+curl -fsSL https://raw.githubusercontent.com/lemun/quickshell-dots/main/install.sh | bash -s V1
 ```
 
 Use `V2` instead to start with the V2 interface. Both UI variants are installed
@@ -38,13 +41,13 @@ process.
 Install and keep the bar after reboot:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/HANCORE-linux/quickshell-dots/main/install.sh | bash -s V1 --autostart
+curl -fsSL https://raw.githubusercontent.com/lemun/quickshell-dots/main/install.sh | bash -s V1 --autostart
 ```
 
 Remove the bar and restore your previous config:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/HANCORE-linux/quickshell-dots/main/uninstall.sh | bash
+curl -fsSL https://raw.githubusercontent.com/lemun/quickshell-dots/main/uninstall.sh | bash
 ```
 
 The installer backs up an existing config to `~/.config/quickshell/bar.bak.<timestamp>`.

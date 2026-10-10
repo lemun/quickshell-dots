@@ -151,7 +151,7 @@ Item {
 
     readonly property bool anyPopupVisible: calendarVisible || cpuVisible || gpuVisible
         || thermalVisible || aiUsageVisible
-        || memVisible || volVisible || controlVisible || networkVisible || bluetoothVisible
+        || memVisible || volVisible || controlVisible || networkVisible || bluetoothVisible || airpodsVisible
         || batteryVisible || brightnessVisible || mprisVisible || weatherVisible
         || workspaceVisible || imagePickerVisible || mediaBrowserVisible || notifVisible
         || powerProfileVisible || storageVisible || archVisible || trayVisible || trayMenuVisible
@@ -393,6 +393,7 @@ Item {
         if (except !== "controlVisible") controlVisible = false
         if (except !== "networkVisible") networkVisible = false
         if (except !== "bluetoothVisible") bluetoothVisible = false
+        if (except !== "airpodsVisible") airpodsVisible = false
         if (except !== "batteryVisible") batteryVisible = false
         if (except !== "brightnessVisible") brightnessVisible = false
         if (except !== "mprisVisible") mprisVisible = false
@@ -2543,6 +2544,9 @@ Item {
     onNetworkVisibleChanged: popupOpened("networkVisible")
     property bool storageVisible:   false
     onStorageVisibleChanged: popupOpened("storageVisible")
+    property real airpodsBarX: 0
+    property bool airpodsVisible: false
+    onAirpodsVisibleChanged: popupOpened("airpodsVisible")
     property bool bluetoothVisible: false
     onBluetoothVisibleChanged: popupOpened("bluetoothVisible")
     property bool batteryVisible:   false
@@ -3021,7 +3025,7 @@ Item {
     // bar-widget center used by both the caret and the small border opening.
     readonly property bool anchoredPanelVisible: calendarVisible || cpuVisible || gpuVisible
         || thermalVisible || aiUsageVisible
-        || memVisible || volVisible || controlVisible || networkVisible || bluetoothVisible
+        || memVisible || volVisible || controlVisible || networkVisible || bluetoothVisible || airpodsVisible
         || batteryVisible || brightnessVisible || mprisVisible || weatherVisible
         || workspaceVisible || notifVisible || powerProfileVisible || storageVisible
         || archVisible || trayVisible

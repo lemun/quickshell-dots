@@ -1,4 +1,5 @@
 import QtQuick
+import "../../../core" as AirPods
 import Quickshell
 import Quickshell.Io
 import "../IconMap.js" as IconMap
@@ -30,6 +31,7 @@ Item {
 
     Row {
         id: row
+        z: 1
         anchors.centerIn: parent
         spacing: 4
 
@@ -50,6 +52,11 @@ Item {
             color: root.widgetHasFill("G15") ? rootMod.contentColor : root.seal
             font.family: root.mono
             font.pixelSize: 12
+        }
+        AirPods.AirPodsBadge {
+            anchors.verticalCenter: parent.verticalCenter
+            theme: rootMod.root
+            foreground: rootMod.root.ink
         }
     }
 

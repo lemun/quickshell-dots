@@ -7,18 +7,20 @@
 # Autostart via Omarchy post-boot hook (opt-in).
 set -euo pipefail
 
-REPO_URL="https://github.com/HANCORE-linux/quickshell-dots.git"
+REPO_URL="${QS_SHELL_REPO_URL:-https://github.com/lemun/quickshell-dots.git}"
 DEST="$HOME/.config/quickshell/bar"
 QSR_STATE_ROOT="${XDG_STATE_HOME:-$HOME/.local/state}/quickshell-rise"
 QSR_VARIANT_STATE="$QSR_STATE_ROOT/active-variant"
 QSR_LEGACY_VARIANT_STATE="$QSR_STATE_ROOT/active-version"
 
 # args: optional initial UI variant + flags
+WANT_PROFILE=""
 WANT_VERSION=""
 WANT_AUTOSTART="" # "" = leave unchanged and print hint, "yes" = install hook, "no" = remove hook
 WANT_CLAUDE=""   # "" = ask interactively, "yes"/"no" = non-interactive
 for a in "$@"; do
   case "$a" in
+    --profile=*)         WANT_PROFILE="${a#--profile=}" ;;
     --autostart)          WANT_AUTOSTART="yes" ;;
     --no-autostart)       WANT_AUTOSTART="no"  ;;
     --claude-backend|--ai-backend)       WANT_CLAUDE="yes" ;;
@@ -128,6 +130,12 @@ install_shell_updater() {
   local repodir="$HOME/.local/share/quickshell-dots"
 
   if [[ -d "$repodir/.git" ]]; then
+    if [[ "$(git -C "$repodir" remote get-url origin)" != "$REPO_URL" ]]; then
+      if ! git -C "$repodir" remote get-url upstream >/dev/null 2>&1; then
+        git -C "$repodir" remote add upstream "$(git -C "$repodir" remote get-url origin)"
+      fi
+      git -C "$repodir" remote set-url origin "$REPO_URL"
+    fi
     git -C "$repodir" fetch --quiet origin || true
   else
     mkdir -p "$(dirname "$repodir")"
@@ -489,6 +497,11 @@ if [[ -f "$tmp/repo/hooks/50-quickshell-bar.sh" ]]; then
   info "Theme hook installed (bar follows Omarchy themes)"
 fi
 
+# Personal layout is opt-in and is backed up independently of the bar payload.
+if [[ -n "$WANT_PROFILE" ]]; then
+  python3 "$tmp/repo/scripts/qs-apply-profile.py" "$WANT_PROFILE"
+fi
+
 # ── 6. start and verify Rise before changing the stock provider ─
 # Use the controller from the same downloaded generation as the staged QML. Its
 # start-wait contract validates lifecycle.ready(), a stable instance identity and
@@ -524,7 +537,7 @@ fi
 install_shell_updater "$tmp/repo" || warn "Self-updater setup incomplete — the bar is fine; the update badge just won't appear."
 
 # ── 7. autostart hook / hint ─────────────────────────────────────
-RAW="https://raw.githubusercontent.com/HANCORE-linux/quickshell-dots/main"
+RAW="https://raw.githubusercontent.com/lemun/quickshell-dots/main"
 case "$WANT_AUTOSTART" in
   yes)
     if command -v omarchy >/dev/null 2>&1; then

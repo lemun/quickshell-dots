@@ -8,6 +8,7 @@ import Quickshell
 import Quickshell.Io
 import Quickshell.Wayland
 import QtQuick
+import "../../core" as AirPods
 import "panels"
 
 Item {
@@ -260,6 +261,7 @@ Item {
     NotificationPanel { root: theme }
     NetworkPanel { root: theme }
     BluetoothPanel { root: theme }
+    AirPods.AirPodsPanel { root: theme }
     BatteryPanel { root: theme }
     BrightnessPanel { root: theme }
     MprisPanel { root: theme }

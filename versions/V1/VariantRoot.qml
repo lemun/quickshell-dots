@@ -8,6 +8,7 @@ import Quickshell
 import Quickshell.Io
 import Quickshell.Wayland
 import QtQuick
+import "core" as AirPods
 import "panels"
 // Compatibility bridge for already-installed integrated updaters whose smoke
 // wrapper loads this adapter directly. Register the lazy V2 bundle here as well
@@ -259,6 +260,7 @@ Item {
     NotificationPanel { root: theme }
     NetworkPanel { root: theme }
     BluetoothPanel { root: theme }
+    AirPods.AirPodsPanel { root: theme }
     BatteryPanel { root: theme }
     BrightnessPanel { root: theme }
     MprisPanel { root: theme }
