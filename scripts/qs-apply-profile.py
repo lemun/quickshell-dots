@@ -15,6 +15,10 @@ files = {
     'quickshell_widgets_v2': home / '.cache/quickshell_widgets_v2',
     'quickshell_barorder_v2': home / '.cache/quickshell_barorder_v2',
 }
+# New snapshots can also carry V1 preferences; older V2-only profiles still work.
+for name in ('quickshell_widgets', 'quickshell_barorder'):
+    if (source / name).is_file():
+        files[name] = home / '.cache' / name
 backup = home / '.local/state/quickshell-rise/profile-backups' / datetime.now().strftime('%Y%m%d-%H%M%S-%f')
 # Validate the entire profile before writing preferences.
 for name in files:

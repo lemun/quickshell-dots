@@ -52,6 +52,13 @@ QS_SHELL_RUN_REAL_VARIANT_SMOKE=1 ./tests/qs-shell-update-regression.sh
 
 Stop after the first failure and preserve its output. A later passing suite does not invalidate an earlier lifecycle or rollback failure.
 
+The profile publishing helper uses local Git fixtures (no network or live
+configuration changes):
+
+```bash
+python3 tests/qs-save-profile-regression.py
+```
+
 ## Check shell scripts
 
 Validate shell syntax for entry points, helpers, and tests:

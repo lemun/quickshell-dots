@@ -1,0 +1,96 @@
+#!/usr/bin/env python3
+"""Save the current bar as the shai profile, commit it, and push to the fork."""
+import argparse
+from datetime import datetime
+from pathlib import Path
+import shutil
+import subprocess
+import sys
+import tempfile
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--home', type=Path, default=Path.home(),
+                        help='home directory containing the running bar preferences')
+    args = parser.parse_args()
+    repo = Path(__file__).resolve().parents[1]
+    profile = repo / 'profiles/shai'
+    required = ('quickshell_widgets_v2', 'quickshell_barorder_v2')
+    optional = ('quickshell_widgets', 'quickshell_barorder')
+
+    def git(*arguments, capture=True):
+        return subprocess.run(['git', '-C', str(repo), *arguments], check=True,
+                              text=True, stdout=subprocess.PIPE if capture else None).stdout
+
+    if git('status', '--porcelain').strip():
+        raise ValueError('Checkout has unsaved changes. Commit or stash them before saving the profile.')
+    if git('branch', '--show-current').strip() != 'main':
+        raise ValueError('Switch this checkout to main before saving the profile.')
+    origin = git('config', '--get', 'remote.origin.url').strip().removesuffix('.git').rstrip('/')
+    if origin not in ('https://github.com/lemun/quickshell-dots',
+                      'git@github.com:lemun/quickshell-dots',
+                      'ssh://git@github.com/lemun/quickshell-dots'):
+        raise ValueError('origin must point to lemun/quickshell-dots before publishing a profile.')
+
+    def snapshot():
+        data = {}
+        for name in required:
+            source = args.home / '.cache' / name
+            if not source.is_file() or not source.read_bytes().strip():
+                raise ValueError(f'Missing or empty bar preferences: {source}')
+            data[name] = source.read_bytes()
+        controller = args.home / '.config/quickshell/bin/qs-barctl'
+        variant = subprocess.run([str(controller), 'status'], check=True,
+                                 text=True, stdout=subprocess.PIPE).stdout.strip()
+        if variant not in ('v1', 'v2'):
+            raise ValueError('Start the bar before saving: its active variant could not be determined.')
+        for name in optional:
+            source = args.home / '.cache' / name
+            if source.is_file() and source.read_bytes().strip():
+                data[name] = source.read_bytes()
+            elif variant == 'v1':
+                raise ValueError(f'Missing V1 bar preferences: {source}')
+        data['active-variant'] = (variant + '\n').encode()
+        return data
+
+    # Validate local inputs before any network or repository changes.
+    snapshot()
+    git('pull', '--ff-only', 'origin', 'main', capture=False)
+    data = snapshot()
+    names = tuple(data)
+    paths = [f'profiles/shai/{name}' for name in names]
+    changed = any(not (profile / name).is_file()
+                  or (profile / name).read_bytes() != data[name] for name in names)
+    if changed:
+        backup = (args.home / '.local/state/quickshell-rise/profile-backups'
+                  / ('saved-default-' + datetime.now().strftime('%Y%m%d-%H%M%S-%f')))
+        backup.mkdir(parents=True)
+        for name in names:
+            target = profile / name
+            if target.exists():
+                shutil.copy2(target, backup / name)
+        print(f'Previous default backed up to {backup}', flush=True)
+        profile.mkdir(parents=True, exist_ok=True)
+        for name in names:
+            with tempfile.NamedTemporaryFile(dir=profile, delete=False) as temporary:
+                temporary.write(data[name])
+                temporary_path = Path(temporary.name)
+            temporary_path.chmod(0o644)
+            temporary_path.replace(profile / name)
+        git('add', '--', *paths, capture=False)
+        git('commit', '--only', '-m', 'Update my default bar layout', '--', *paths, capture=False)
+    # Also retry publication of a previous successful save whose push failed.
+    git('push', 'origin', 'main', capture=False)
+    print('Your default shai bar layout is saved and published.' if changed
+          else 'Your default shai bar layout already matches; fork is synced.')
+
+
+if __name__ == '__main__':
+    try:
+        main()
+    except (ValueError, OSError, subprocess.CalledProcessError) as error:
+        print(f'Could not publish the bar profile: {error}', file=sys.stderr)
+        print('Local files and any completed commit are retained. Resolve the error and rerun.',
+              file=sys.stderr)
+        sys.exit(1)

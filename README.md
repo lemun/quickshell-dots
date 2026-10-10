@@ -1,4 +1,5 @@
 > Personal fork: AirPods integration and Shai's saved V2 layout.
+> Save your current layout as the default: `~/Work/quickshell-dots/scripts/qs-save-profile`.
 > Restore this exact bar on another Omarchy installation: [copy-and-paste setup guide](docs/airpods.md).
 
 <h1 align="center"> Quickshell Rise </h1>

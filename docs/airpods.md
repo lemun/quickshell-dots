@@ -5,6 +5,28 @@ levels, supported listening modes, conversation awareness, and right-click mode
 cycling. Its panel uses the shared popup lifecycle. In V2 it uses the connected
 panel surface and bar animation. No separate restoration patch is needed.
 
+## Save your current customization as the default
+
+After changing the bar settings, run this one command:
+
+```bash
+~/Work/quickshell-dots/scripts/qs-save-profile
+```
+
+It updates the checkout from your fork, backs up the previous saved default,
+captures your current widgets, layout, appearance settings, and active V1/V2
+variant, then commits and pushes them to `lemun/quickshell-dots`. If nothing
+changed, it simply syncs the fork. Run it whenever you want your latest changes
+to become the default for future installations.
+
+The checkout must be on `main` with no uncommitted changes. Git push access to
+your fork must already be configured. If a push fails, the saved commit stays
+local; resolve the connection or Git error and rerun the same command.
+
+This saves bar preferences. The Omarchy desktop theme, pairing keys, and account
+credentials are configured separately. Existing machines keep their preferences
+until you explicitly reapply the profile using the command below.
+
 ## Restore Shai's bar on another Omarchy installation
 
 Run these commands in a terminal on the new machine. The saved `shai` profile
@@ -19,20 +41,20 @@ mkdir -p ~/Work
 cd ~/Work
 git clone https://github.com/lemun/quickshell-dots.git
 cd quickshell-dots
-bash install.sh V2 --autostart --no-ai-backend --profile=shai
+bash install.sh --autostart --no-ai-backend --profile=shai
 ```
 
 If the checkout already exists, run `git pull --ff-only origin main` inside it
 instead of cloning again, then run the installer command.
 
 `--profile=shai` restores the saved widgets, their order, spacing, bar shape,
-position, and appearance settings. It backs up previous preferences. `V2`
-selects the saved bar style, `--autostart` enables login startup, and
+position, and appearance settings. It backs up previous preferences and selects your saved V1/V2 variant.
+`--autostart` enables login startup, and
 `--no-ai-backend` skips installing account usage backends. The profile does not
 copy account credentials; account-dependent widgets need their own setup.
 
-With no explicit V1/V2 argument, the installer uses the profile's saved V2
-variant. An explicit V1 argument takes precedence. Omit `--profile=shai` when
+With no explicit V1/V2 argument, the installer uses the profile's saved
+variant (currently V2). An explicit V1 or V2 argument takes precedence. Omit `--profile=shai` when
 you want to keep the new machine's existing bar preferences.
 
 ### 2. Match the colors
@@ -81,7 +103,7 @@ systemctl --user is-active librepods.service
 git -C ~/.local/share/quickshell-dots remote get-url origin
 ```
 
-Expected results are `v2`, `active`, and
+Expected results are your saved variant (`v2` initially), `active`, and
 `https://github.com/lemun/quickshell-dots.git`. After connecting your AirPods,
 open the panel and check that battery values appear. Battery availability and
 listening controls depend on the AirPods model and what the daemon reports.
@@ -104,7 +126,7 @@ python3 scripts/qs-apply-profile.py shai
 
 Profile backups are saved under
 `~/.local/state/quickshell-rise/profile-backups/`. The profile is a saved
-snapshot; later adjustments on your desktop do not automatically update it.
+snapshot; run `qs-save-profile` after later adjustments to publish a new default.
 
 ## Keep the fork updated
 
