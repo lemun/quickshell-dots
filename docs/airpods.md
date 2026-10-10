@@ -5,38 +5,106 @@ levels, supported listening modes, conversation awareness, and right-click mode
 cycling. Its panel uses the shared popup lifecycle. In V2 it uses the connected
 panel surface and bar animation. No separate restoration patch is needed.
 
-## Install on another Omarchy box
+## Restore Shai's bar on another Omarchy installation
+
+Run these commands in a terminal on the new machine. The saved `shai` profile
+matches the layout and appearance preferences verified on Shai's machine on
+2026-10-10. This is the Quickshell Rise bar; the installer starts it at login
+and handles the stock Omarchy bar through its existing integration.
+
+### 1. Install the bar and saved customization
 
 ```bash
+mkdir -p ~/Work
+cd ~/Work
 git clone https://github.com/lemun/quickshell-dots.git
 cd quickshell-dots
 bash install.sh V2 --autostart --no-ai-backend --profile=shai
 ```
 
-`--profile=shai` restores the saved widget selection, layout, and appearance.
-It backs up previous preferences. With no explicit V1/V2 argument, the installer
-uses the profile's saved V2 variant; an explicit argument takes precedence.
-Omit the profile option to keep that machine's preferences.
-The bar follows the machine's current Omarchy theme. Monitor configuration,
-wallpapers, credentials, Bluetooth pairing keys, and other desktop settings
-are not part of this bar profile. Pair your AirPods independently on each box.
+If the checkout already exists, run `git pull --ff-only origin main` inside it
+instead of cloning again, then run the installer command.
 
-The AirPods daemon is a separate dependency:
+`--profile=shai` restores the saved widgets, their order, spacing, bar shape,
+position, and appearance settings. It backs up previous preferences. `V2`
+selects the saved bar style, `--autostart` enables login startup, and
+`--no-ai-backend` skips installing account usage backends. The profile does not
+copy account credentials; account-dependent widgets need their own setup.
+
+With no explicit V1/V2 argument, the installer uses the profile's saved V2
+variant. An explicit V1 argument takes precedence. Omit `--profile=shai` when
+you want to keep the new machine's existing bar preferences.
+
+### 2. Match the colors
+
+The bar follows the active Omarchy theme. Shai's theme at verification was
+**Matrix**. To use the same colors:
+
+```bash
+omarchy theme set Matrix
+```
+
+If Matrix is not installed, install it first, then select it:
+
+```bash
+omarchy theme install https://github.com/BVisagie/omarchy-matrix-theme
+omarchy theme set Matrix
+```
+
+You can choose another theme and keep the same bar layout. Wallpapers and
+monitor configuration are separate from this bar profile.
+
+### 3. Install the AirPods daemon
+
+The AirPods UI is already included in the fork. Its daemon is a separate
+installation:
 
 ```bash
 omarchy plugin add https://github.com/thisisgm/omarchy-pods --enable
 ~/.config/omarchy/plugins/io.github.thisisgm.omapods/setup
 ```
 
-The icon stays visible and displays a service/disconnected message until the
-daemon and paired AirPods are available. Building the daemon may request package
-installation privileges. These commands run the upstream plugin's setup.
+The setup command builds and installs the daemon and enables its user service.
+It may request your password to install build dependencies.
 
-To reapply only the personal preferences (without switching variants) from this checkout:
+Pair and connect your AirPods using the new machine's Bluetooth settings.
+Pairing keys are not included in the profile. Left-click the AirPods icon next
+to Bluetooth to see batteries and supported controls. Right-click cycles
+supported listening modes. The icon remains visible when disconnected; an
+unavailable-service message means the daemon needs attention.
+
+### 4. Check the installation
+
+```bash
+~/.config/quickshell/bin/qs-barctl status
+systemctl --user is-active librepods.service
+git -C ~/.local/share/quickshell-dots remote get-url origin
+```
+
+Expected results are `v2`, `active`, and
+`https://github.com/lemun/quickshell-dots.git`. After connecting your AirPods,
+open the panel and check that battery values appear. Battery availability and
+listening controls depend on the AirPods model and what the daemon reports.
+
+If the daemon is unavailable:
+
+```bash
+systemctl --user restart librepods.service
+journalctl --user -u librepods.service -n 50 --no-pager
+```
+
+## Reapply the saved layout later
+
+From the fork checkout, this restores only preferences and backs up your
+current ones. It does not switch variants or change the desktop theme:
 
 ```bash
 python3 scripts/qs-apply-profile.py shai
 ```
+
+Profile backups are saved under
+`~/.local/state/quickshell-rise/profile-backups/`. The profile is a saved
+snapshot; later adjustments on your desktop do not automatically update it.
 
 ## Keep the fork updated
 

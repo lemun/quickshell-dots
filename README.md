@@ -1,5 +1,5 @@
 > Personal fork: AirPods integration and Shai's saved V2 layout.
-> See [setup and upstream updates](docs/airpods.md).
+> Restore this exact bar on another Omarchy installation: [copy-and-paste setup guide](docs/airpods.md).
 
 <h1 align="center"> Quickshell Rise </h1>
 
