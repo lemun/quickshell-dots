@@ -10,6 +10,7 @@ Item {
     required property var screen
     readonly property color contentColor: root.widgetContentColor("G15", root.ink)
 
+    readonly property real bluetoothCaretX: row.x + bluetoothIcon.x + bluetoothIcon.width / 2
     readonly property real airpodsCaretX: row.x + airpodsBadge.x + airpodsBadge.width / 2
 
     property bool btOn:       false
@@ -39,6 +40,7 @@ Item {
         spacing: 4
 
         IconText {
+            id: bluetoothIcon
             anchors.verticalCenter: parent.verticalCenter
             text: IconMap.icon(rootMod.iconN)
             color: rootMod.connected

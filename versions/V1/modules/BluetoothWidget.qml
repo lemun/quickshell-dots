@@ -9,6 +9,7 @@ Item {
     required property var root
     required property var screen
 
+    readonly property real bluetoothCaretX: row.x + bluetoothIcon.x + bluetoothIcon.width / 2
     readonly property real airpodsCaretX: row.x + airpodsBadge.x + airpodsBadge.width / 2
 
     property bool btOn:       false
@@ -59,6 +60,7 @@ Item {
         }
 
         IconText {
+            id: bluetoothIcon
             anchors.verticalCenter: parent.verticalCenter
             text: IconMap.icon(rootMod.iconN)
             color: rootMod.connected

@@ -2064,7 +2064,7 @@ PanelWindow {
                 workspace:    island.groupX("G2",  0.5),
                 arch:         island.groupX("G3",  0.5),
                 archCaret:    island.groupContentX("G3", "archCaretX", 0.5),
-                bluetooth:    island.groupX("G15", 0.5),
+                bluetooth:    island.groupContentX("G15", "bluetoothCaretX", 0.5),
                 airpods:      island.groupContentX("G15", "airpodsCaretX", 0.5),
                 brightness:   island.groupX("G13", 0.5),
                 power:        island.groupX("G14", 0.5),
