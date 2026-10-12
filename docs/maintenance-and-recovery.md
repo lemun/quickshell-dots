@@ -45,6 +45,16 @@ $HOME/.config/quickshell/bin/qs-barctl start-wait
 
 The non-waiting `start` and `stop` forms dispatch the same work in the background. Use the `-wait` commands when another command depends on the result.
 
+The controller starts the bar with systemd crash recovery. An unexpected kill,
+crash, or nonzero exit restarts it after two seconds, preserving the saved variant
+and preferences. Clean exits and normal controller stops stay stopped. Starts
+are limited to three within 60 seconds; repeated failures need investigation
+instead of an endless restart loop. This protects against a dead process, not
+a running process with a missing or unresponsive surface.
+
+After updating the controller, stop and start Rise once to give the running unit
+this policy. Fresh installs and subsequent launches receive it automatically.
+
 ## Apply shell and package updates
 
 Rise checks the repository and displays a shell update badge when `main` contains a newer generation. Open the update panel to review the change before applying it.

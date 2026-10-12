@@ -243,7 +243,9 @@ qsr_start_bar_unit() {
 
   unit="$QSR_UNIT_PREFIX-bar-$(qsr_random_id)"
   args=(--user --collect --quiet "--unit=$unit" "--slice=app-graphical.slice"
-        "--property=Type=exec")
+        "--property=Type=exec" "--property=Restart=on-failure"
+        "--property=RestartSec=2s" "--property=StartLimitIntervalSec=60s"
+        "--property=StartLimitBurst=3")
   qsr_systemd_env_args args
   "$QSR_SYSTEMD_RUN_BIN" "${args[@]}" -- "$QSR_QS_BIN" -n -p "$QSR_CONFIG" \
     || qsr_fail "could not submit integrated bar unit" || return 1

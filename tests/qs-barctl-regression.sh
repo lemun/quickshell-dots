@@ -299,6 +299,10 @@ test_degraded_bar_is_rebuilt() {
   assert_not_contains hung "$root/instances.tsv" "degraded bar was retained"
   assert_contains newbar "$root/instances.tsv" "degraded bar was not rebuilt"
   assert_eq V2 "$(cut -f6 "$root/instances.tsv")" "rebuilt bar lost saved variant behavior"
+  assert_contains '--property=Restart=on-failure' "$root/systemd.log" "bar lacks crash recovery"
+  assert_contains '--property=RestartSec=2s' "$root/systemd.log" "bar lacks restart delay"
+  assert_contains '--property=StartLimitIntervalSec=60s' "$root/systemd.log" "bar lacks retry window"
+  assert_contains '--property=StartLimitBurst=3' "$root/systemd.log" "bar lacks restart loop protection"
 }
 
 test_foreign_quickshell_is_untouched() {
