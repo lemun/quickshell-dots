@@ -2009,6 +2009,7 @@ Item {
     // dock  = centered content-width surface attached to the screen edge
     // notch = attached content-width surface with desktop-facing side wings
     property string barShellStyle: "full"
+    property bool barAutoHide: false
     property bool barBorderEnabled: true
     property bool panelTooltipBorderEnabled: true
     function barShellStyleValid(value) {
@@ -2262,6 +2263,7 @@ Item {
     onArchBadgeShellChanged:    if (_widgetsLoaded) saveWidgets()
     onWorkspaceStyleChanged:   if (_widgetsLoaded) saveWidgets()
     onBarPositionChanged:      if (_widgetsLoaded) saveWidgets()
+    onBarAutoHideChanged:      if (_widgetsLoaded) saveWidgets()
     onBarShellStyleChanged:    if (_widgetsLoaded) saveWidgets()
     onBarBorderEnabledChanged: if (_widgetsLoaded) saveWidgets()
     onPanelTooltipBorderEnabledChanged: if (_widgetsLoaded) saveWidgets()
@@ -2311,7 +2313,8 @@ Item {
                  + mprisBarStyle + " "                                  // +41 now-playing bar presentation
                  + barShellStyle + " "                                  // +42 outer bar shell
                  + (barBorderEnabled ? "1" : "0") + " "                 // +43 outer bar border
-                 + (panelTooltipBorderEnabled ? "1" : "0")              // +44 panel + tooltip outer border
+                 + (panelTooltipBorderEnabled ? "1" : "0") + " "        // +44 panel + tooltip outer border
+                 + (barAutoHide ? "1" : "0")                            // +45 auto-hide
         widgetSaveProc.command = ["bash", "-c",
             "echo '" + line + "' > '" + widgetsCachePath + "'"]
         widgetSaveProc.running = false
@@ -2532,6 +2535,8 @@ Item {
                         theme.barBorderEnabled = parts[wsField + 43] !== "0"
                     if (parts.length > wsField + 44)
                         theme.panelTooltipBorderEnabled = parts[wsField + 44] !== "0"
+                    if (parts.length > wsField + 45)
+                        theme.barAutoHide = parts[wsField + 45] === "1"
                 }
                 theme._widgetsLoaded = true
             }

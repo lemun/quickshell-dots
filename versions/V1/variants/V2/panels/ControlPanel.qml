@@ -316,6 +316,13 @@ PanelWindow {
                 }
             }
 
+            Tile {
+                width: parent.width
+                label: "Auto-hide"
+                active: root.barAutoHide
+                onActivated: root.barAutoHide = !root.barAutoHide
+            }
+
             // ── POWER (collapsed sub-menu; nothing destructive pre-shown) ──
             Tile {
                 width: parent.width

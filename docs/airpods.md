@@ -31,7 +31,7 @@ until you explicitly reapply the profile using the command below.
 
 Run these commands in a terminal on the new machine. The saved `shai` profile
 matches the layout and appearance preferences verified on Shai's machine on
-2026-10-10. This is the Quickshell Rise bar; the installer starts it at login
+2026-10-12. This is the Quickshell Rise bar; the installer starts it at login
 and handles the stock Omarchy bar through its existing integration.
 
 ### 1. Install the bar and saved customization
@@ -160,3 +160,12 @@ fff7fec600a5b9a61cdb40e93eccbcceb4b8f824 (MIT, copyright 2026 GM).
 The license is preserved at licenses/omarchy-pods-MIT.txt. The icon in this fork
 is an original geometric drawing. The separate daemon is upstream librepods
 under GPL-3.0 and is installed independently; it is not copied into this fork.
+
+## Auto-hide (V2)
+
+The Shai profile enables Auto-hide. Move the pointer to the 2px screen edge
+above the bar (below it for bottom placement) to reveal it. It hides 350ms
+after leaving, and stays visible while its popup or layout editor is open.
+Windows use the full screen height; the revealed bar overlays them.
+Toggle **Auto-hide** in the bar's Control panel to restore reserved space.
+Older saved preferences keep their existing always-visible behavior.

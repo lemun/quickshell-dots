@@ -34,6 +34,18 @@ PanelWindow {
                 island.fitNaturalWidth))
         : barSlot.width
 
+    AutoHideController {
+        id: autoHide
+        enabled: barSlot.root.barAutoHide && barSlot.root._widgetsLoaded
+        held: barSlot.root.barUnlocked || barSlot.dragging
+            || (barSlot.root.anyPopupVisible
+                && barSlot.root.isActivePopupScreenName(barSlot.screenName))
+    }
+    readonly property int revealStripHeight: 2
+    property real hideOffset: autoHide.shown ? 0
+        : (barSlot.root.barPosition === "bottom" ? 1 : -1) * (shellVisibleHeight + 12)
+    Behavior on hideOffset { NumberAnimation { duration: 160; easing.type: Easing.OutCubic } }
+
     color: "transparent"
     // ALWAYS screen-tall → window never resizes → NO compositor resize animation.
     // Reserve the visible bar strip; the mask limits the INPUT region to the bar
@@ -47,22 +59,25 @@ PanelWindow {
     }
     implicitHeight: barSlot.screen ? barSlot.screen.height : 1440
     exclusionMode: ExclusionMode.Normal
-    // Keep the same compositor reservation for every shell style: clients must
-    // never slide behind a content-width Fit/Dock/Notch bar.
-    exclusiveZone: barSlot.root.v2BarHeight + 3
+    // Auto-hide overlays clients, so revealing never moves their windows.
+    exclusiveZone: autoHide.enabled ? 0 : barSlot.root.v2BarHeight + 3
+    readonly property real inputHeight: autoHide.shown ? shellVisibleHeight : revealStripHeight
     mask: Region {
         x: barSlot.root.barUnlocked ? 0 : Math.round(continuousBarSurface.x)
         y: barSlot.root.barUnlocked ? 0
            : (barSlot.root.barPosition === "bottom"
-                ? barSlot.height - barSlot.shellVisibleHeight : 0)
+                ? barSlot.height - barSlot.inputHeight : 0)
         width: barSlot.root.barUnlocked ? barSlot.width : Math.round(continuousBarSurface.width)
-        height: barSlot.root.barUnlocked ? barSlot.height : barSlot.shellVisibleHeight
+        height: barSlot.root.barUnlocked ? barSlot.height : barSlot.inputHeight
     }
     // grab keyboard while unlocked so ESC can exit
     WlrLayershell.keyboardFocus: barSlot.root.barUnlocked ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
 
     HoverHandler {
-        onHoveredChanged: if (hovered && !barSlot.root.anyPopupVisible) barSlot.root.activatePopupScreen(barSlot.screen)
+        onHoveredChanged: {
+            autoHide.hovered = hovered
+            if (hovered && !barSlot.root.anyPopupVisible) barSlot.root.activatePopupScreen(barSlot.screen)
+        }
     }
 
     // keep Hyprland awake while the idle-inhibitor toggle is on (carried over
@@ -86,9 +101,8 @@ PanelWindow {
     Rectangle {
         id: continuousBarSurface
         x: barSlot.compactShell ? Math.round((barSlot.width - width) / 2) : 0
-        y: barSlot.root.barPosition === "bottom"
-            ? barSlot.height - height
-            : 0
+        y: (barSlot.root.barPosition === "bottom"
+            ? barSlot.height - height : 0) + barSlot.hideOffset
         width: barSlot.shellTargetWidth
         height: barSlot.shellVisibleHeight
         radius: barSlot.compactShell ? barSlot.shellRadius : 0
@@ -1794,7 +1808,7 @@ PanelWindow {
         x: continuousBarSurface.x
         width: continuousBarSurface.width
         height: barSlot.root.v2BarHeight
-        y: barSlot.root.barPosition === "bottom" ? parent.height - height : 0
+        y: continuousBarSurface.y
         z: 2                                  // above the dim backdrop
         focus: barSlot.root.barUnlocked       // receive keys while unlocked
         Keys.onEscapePressed: barSlot.root.barUnlocked = false
